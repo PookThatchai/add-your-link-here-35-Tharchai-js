@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pook shop</title>
+  </head>
+  <body>
+    <div id="head">
+      <h1 id="header">Shopping Cart</h1>
+      <h2>Add item for selection</h2>
+      <div id="product-box">
+        <span>Product name: <input id="product-name" type="text" /></span>
+        <span>Price: <input id="product-price" type="number" /></span>
+        <span>Img: <input id="product-img" type="url" /></span>
+        <button id="create-button" onclick="addProduct()">Create</button>
+      </div>
+      <div id="dashboard-box">
+        <ul></ul>
+      </div>
+      <button id="add-to-cart" onclick="addToCart()">Add to cart</button>
+      <div id="cart-box">
+        <ul></ul>
+      </div>
+      <button id="cal-price" onclick="calPrice()">Calculate Final Price</button>
+      <h2 id="calculate">You have to pay:</h2>
+    </div>
+
+    <script>
+      const productName = document.getElementById("product-name");
+      const productPrice = document.getElementById("product-price");
+      const productImg = document.getElementById("product-img");
+      const dashboardBox = document.getElementById("dashboard-box");
+      const cartBox = document.getElementById("cart-box");
+
+      function addProduct() {
+        const product = [
+          productName.value.trim(),
+          productPrice.value.trim(),
+          productImg.value,
+        ];
+
+        const liProduct = document.createElement("li");
+        liProduct.innerHTML = `
+                <span><input class="select-product" type="checkbox"></span>
+                <span class="img-info"><img src="${product[2]}" alt="${product[0]}" style="width:50px;"></span>
+                <span class="name-info">${product[0]}</span>
+                <span class="price-info">$${product[1]}</span>
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>`;
+
+        dashboardBox.appendChild(liProduct);
+        productName.value = "";
+        productPrice.value = "";
+        productImg.value = "";
+
+        const deleteBtn = liProduct.querySelector(".delete-button");
+        deleteBtn.addEventListener("click", function () {
+          deleteProduct(liProduct);
+        });
+      }
+
+      function deleteProduct(liProduct) {
+        dashboardBox.removeChild(liProduct);
+      }
+      // Function add to cart
+      function addToCart() {
+        const selectProduct = document.querySelectorAll(
+          ".select-product:checked"
+        );
+        selectProduct.forEach((selected) => {
+          const liSelectProduct = selected.closest("li");
+          const productName =
+            liSelectProduct.querySelector(".name-info").textContent;
+          const productPrice =
+            liSelectProduct.querySelector(".price-info").textContent;
+
+          const liCartProduct = document.createElement("li");
+          liCartProduct.innerHTML = `${productName} - ${productPrice} <button class="delete-button">Delete</button>`;
+          cartBox.appendChild(liCartProduct);
+
+          const deleteCartBtn = liCartProduct.querySelector(".delete-button");
+          deleteCartBtn.addEventListener("click", function () {
+            cartBox.removeChild(liCartProduct);
+          });
+        });
+      }
+      // Price calculation
+      function calPrice() {
+        const cartItems = cartBox.querySelectorAll("li");
+        let total = 0;
+
+        cartItems.forEach((item) => {
+          const priceText = item.innerHTML.split("- ")[1].split(" <")[0];
+          if (priceText) {
+            total += parseFloat(priceText.replace("$", ""));
+          }
+        });
+
+        const totalPriceElement = document.getElementById("calculate");
+        totalPriceElement.textContent = `You have to pay: $${total.toFixed(2)}`;
+      }
+    </script>
+  </body>
+</html>
